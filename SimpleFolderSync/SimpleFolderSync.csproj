@@ -5,11 +5,19 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon />
+    <ApplicationIcon>Assets\folder-sync.ico</ApplicationIcon>
     <AssemblyName>SimpleFolderSync</AssemblyName>
     <RootNamespace>SimpleFolderSync</RootNamespace>
     <Version>0.1.0</Version>
     <FileVersion>0.1.0.0</FileVersion>
     <AssemblyVersion>0.1.0.0</AssemblyVersion>
   </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Assets\folder-sync.png" />
+    <Content Include="Assets\folder-sync.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

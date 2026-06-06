@@ -2,16 +2,17 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Simple Folder Sync"
+        Icon="pack://application:,,,/Assets/folder-sync.png"
         Width="1120"
         Height="720"
         MinWidth="900"
         MinHeight="620"
-        Background="#F8FAFC">
+        Background="#0F172A">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Margin" Value="0,0,10,10" />
             <Setter Property="Padding" Value="14,9" />
-            <Setter Property="Background" Value="#7C3AED" />
+            <Setter Property="Background" Value="#3B82F6" />
             <Setter Property="Foreground" Value="White" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="FontWeight" Value="SemiBold" />
@@ -34,61 +35,136 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Background="#7C3AED" Padding="28,24">
-            <StackPanel>
-                <TextBlock Text="Simple Folder Sync" Foreground="White" FontSize="30" FontWeight="Bold" />
-                <TextBlock Text="Plan safe one-way or two-way folder syncs." Foreground="#E0F2FE" FontSize="16" Margin="0,6,0,0" />
-            </StackPanel>
+        <Border Grid.Row="0" Background="#0F172A" Padding="24,18">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Simple Folder Sync" Foreground="White" FontSize="32" FontWeight="Bold" />
+                    <TextBlock Text="Folder synchronization with safe preview and apply." Foreground="#CBD5E1" FontSize="16" Margin="0,6,0,0" />
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="Windows App" Foreground="#94A3B8" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Bottom" />
+            </Grid>
         </Border>
 
-        <Grid Grid.Row="1" Margin="28">
+        <Grid Grid.Row="1" Margin="16">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
                 <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-            <Border Grid.Column="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="1" Padding="22">
+            <Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Background="#FFFFFF" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="10" Padding="20">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="Workflow" FontSize="21" FontWeight="SemiBold" Foreground="#0F172A" />
-                    <TextBlock Grid.Row="1" Text="Choose source and target folders, compare changes, review planned copies, and sync intentionally." TextWrapping="Wrap" Foreground="#475569" FontSize="14" Margin="0,8,0,18" />
+                    <TextBlock Grid.Column="0" Grid.ColumnSpan="4" Text="Sync Workflow" FontSize="22" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,0,0,8" />
+                    <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Text="Pick folders, build a plan, and apply with backup + safety checks." TextWrapping="Wrap" Foreground="#475569" FontSize="14" Margin="0,0,0,16" />
 
-                    <Grid Grid.Row="2">
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Source folder" Margin="0,0,8,8" VerticalAlignment="Center" FontWeight="SemiBold" />
+                    <TextBox x:Name="SourcePathTextBox" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Text="Click Choose Source..." IsReadOnly="True" VerticalContentAlignment="Center" />
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Target folder" Margin="0,0,8,8" VerticalAlignment="Center" FontWeight="SemiBold" />
+                    <TextBox x:Name="TargetPathTextBox" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" Text="Click Choose Target..." IsReadOnly="True" VerticalContentAlignment="Center" />
+
+                    <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Margin="0,14,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Mode" Margin="0,0,8,0" VerticalAlignment="Center" FontWeight="SemiBold" />
+                        <ComboBox x:Name="SyncModeCombo" Grid.Column="1" Width="220" SelectedIndex="0" VerticalContentAlignment="Center">
+                            <ComboBoxItem>One-way (Source → Target)</ComboBoxItem>
+                            <ComboBoxItem>Two-way sync</ComboBoxItem>
+                        </ComboBox>
+                        <TextBlock Grid.Column="2" Text="Filters" Margin="14,0,8,0" VerticalAlignment="Center" FontWeight="SemiBold" />
+                        <TextBox x:Name="ExtensionFilterTextBox" Grid.Column="3" Text="*.*" ToolTip="Comma-separated extensions (for example: .txt,.docx,*.*)" />
+                    </Grid>
+
+                    <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox x:Name="DeleteMissingTarget" Grid.Column="0" Content="Mirror deletes in one-way mode" IsChecked="True" />
+                        <CheckBox x:Name="BackupBeforeWrite" Grid.Column="1" Content="Backup overwritten/deleted files" IsChecked="True" Margin="16,0" />
+                        <CheckBox x:Name="IncludeHiddenFiles" Grid.Column="2" Content="Include hidden/system files" />
+                    </Grid>
+
+                    <WrapPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="4" HorizontalAlignment="Left">
+                        <Button Content="Choose Source" Click="OnChooseSource" />
+                        <Button Content="Choose Target" Click="OnChooseTarget" />
+                        <Button Content="Build Sync Plan" Click="OnBuildPlan" />
+                        <Button Content="Apply Plan" Click="OnApplyPlan" />
+                        <Button Content="Clear Log" Click="OnClearLog" />
+                    </WrapPanel>
+
+                    <Grid Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="4">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <WrapPanel>
-                    <Button Content="Choose Source" Click="OnActionButtonClick" />
-                    <Button Content="Choose Target" Click="OnActionButtonClick" />
-                    <Button Content="Build Sync Plan" Click="OnActionButtonClick" />
-                        </WrapPanel>
-                        <ListBox x:Name="ActivityList" Grid.Row="1" BorderBrush="#E2E8F0" BorderThickness="1" Margin="0,8,0,0" />
+                        <DataGrid x:Name="PlanGrid"
+                                  Grid.Row="1"
+                                  BorderBrush="#CBD5E1"
+                                  BorderThickness="1"
+                                  IsReadOnly="True"
+                                  AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  HeadersVisibility="Column"
+                                  Margin="0,8,0,0"
+                                  Height="350">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Relative Path" Width="300" Binding="{Binding RelativePath}" />
+                                <DataGridTextColumn Header="Action" Width="220" Binding="{Binding Action}" />
+                                <DataGridTextColumn Header="Direction" Width="200" Binding="{Binding Direction}" />
+                                <DataGridTextColumn Header="Details" Width="*" Binding="{Binding Details}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </Grid>
                 </Grid>
             </Border>
 
-            <Border Grid.Column="1" Background="#F1F5F9" BorderBrush="#E2E8F0" BorderThickness="1" Padding="22" Margin="18,0,0,0">
+            <Border Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Background="#0B1220" BorderBrush="#1F2937" BorderThickness="1" CornerRadius="10" Padding="20" Margin="18,0,0,0">
                 <StackPanel>
-                    <TextBlock Text="Initial app scope" FontSize="18" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,0,0,14" />
-            <TextBlock Text="Source and target folder setup" Style="{StaticResource FeatureText}" />
-            <TextBlock Text="Copy/update/delete planning" Style="{StaticResource FeatureText}" />
-            <TextBlock Text="Conflict review surface" Style="{StaticResource FeatureText}" />
-            <TextBlock Text="Local-only sync notes" Style="{StaticResource FeatureText}" />
+                    <TextBlock Text="Why this app?" FontSize="18" FontWeight="SemiBold" Foreground="#F8FAFC" Margin="0,0,0,14" />
+                    <TextBlock Text="Built specifically for the folder sync workflow: choose source/target, inspect every operation, then execute only what you approve." TextWrapping="Wrap" Foreground="#CBD5E1" />
+                    <Separator Margin="0,14" Background="#334155" />
+                    <TextBlock Text="What changed" FontSize="18" FontWeight="SemiBold" Foreground="#F8FAFC" Margin="0,0,0,14" />
+                    <TextBlock Text="• One-way and two-way sync modes" TextWrapping="Wrap" Foreground="#CBD5E1" Margin="0,0,0,10" />
+                    <TextBlock Text="• Planned change preview before apply" TextWrapping="Wrap" Foreground="#CBD5E1" Margin="0,0,0,10" />
+                    <TextBlock Text="• Conflict detection and backup folder option" TextWrapping="Wrap" Foreground="#CBD5E1" Margin="0,0,0,10" />
+                    <TextBlock Text="• Live summary + activity log for traceability" TextWrapping="Wrap" Foreground="#CBD5E1" Margin="0,0,0,16" />
                     <Separator Margin="0,10,0,18" />
-                    <TextBlock Text="Store readiness" FontSize="18" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,0,0,10" />
-                    <TextBlock Text="Store-Assets includes listing draft, privacy text, and submission checklist. Package identity still needs the reserved Partner Center name before final MSIX upload." TextWrapping="Wrap" Foreground="#475569" />
+                    <TextBlock Text="Sync summary" FontSize="18" FontWeight="SemiBold" Foreground="#F8FAFC" Margin="0,0,0,10" />
+                    <StackPanel>
+                        <TextBlock Text="Adds / updates / deletes are counted from your latest plan." Foreground="#CBD5E1" />
+                        <TextBlock x:Name="SummaryText" Text="Ready to build plan." Foreground="#94A3B8" TextWrapping="Wrap" Margin="0,8,0,0" />
+                    </StackPanel>
                 </StackPanel>
             </Border>
         </Grid>
 
-        <Border Grid.Row="2" Background="#E2E8F0" Padding="18,10">
-            <TextBlock x:Name="StatusText" Text="Ready" Foreground="#334155" />
+        <Border Grid.Row="2" Background="#111827" Padding="12,10" BorderThickness="1,1,0,0" BorderBrush="#1F2937">
+            <ListBox x:Name="ActivityList" Background="#111827" Foreground="#CBD5E1" BorderThickness="0" Height="82" />
         </Border>
     </Grid>
 </Window>
