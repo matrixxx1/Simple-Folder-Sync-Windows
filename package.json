@@ -1,0 +1,24 @@
+{
+  "name": "simple-folder-sync-windows",
+  "version": "1.0.0",
+  "description": "Plan safe one-way or two-way folder syncs.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matrixxx1/Simple-Folder-Sync-Windows.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/matrixxx1/Simple-Folder-Sync-Windows/issues"
+  },
+  "homepage": "https://github.com/matrixxx1/Simple-Folder-Sync-Windows#readme",
+  "dependencies": {
+    "playwright-core": "^1.60.0"
+  }
+}

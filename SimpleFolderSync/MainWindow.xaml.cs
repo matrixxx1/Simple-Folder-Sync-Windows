@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,6 +16,8 @@ namespace SimpleFolderSync;
 
 public partial class MainWindow : Window
 {
+    private const int TrialDays = 15;
+
     private enum SyncMode
     {
         OneWay,
@@ -30,16 +34,110 @@ public partial class MainWindow : Window
 
     private readonly ObservableCollection<string> _activity = new();
     private readonly ObservableCollection<SyncPlanItem> _plans = new();
+    private readonly object _logSync = new();
+    private readonly string _appDataRoot;
+    private readonly string _licenseStateFile;
+    private readonly string _logsDirectory;
+    private readonly string _backupRoot;
+    private bool _isTrialExpired;
     private static readonly string[] DefaultExcludeDirs = new[] { ".git", "bin", "obj", ".vs", "node_modules" };
 
     public MainWindow()
     {
+        _appDataRoot = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SimpleFolderSync");
+        _licenseStateFile = Path.Combine(_appDataRoot, "license.state.json");
+        _logsDirectory = Path.Combine(_appDataRoot, "Logs");
+        _backupRoot = Path.Combine(_appDataRoot, "Backups");
+
+        InitializeLogging();
         InitializeComponent();
+
         PlanGrid.ItemsSource = _plans;
         ActivityList.ItemsSource = _activity;
+        RefreshLicenseState();
+
         AddActivity("Simple Folder Sync loaded.");
         AddActivity("Build a plan before apply to review every change.");
-        AddActivity("Backups are stored in: Backups\\SimpleFolderSync\\yyyyMMddHHmmss");
+        AddActivity($"Backups are stored in: {_backupRoot}\\yyyyMMddHHmmss");
+    }
+
+    private void InitializeLogging()
+    {
+        Directory.CreateDirectory(_appDataRoot);
+        Directory.CreateDirectory(_logsDirectory);
+        Directory.CreateDirectory(_backupRoot);
+        WriteLog("Application started");
+    }
+
+    private void RefreshLicenseState()
+    {
+        var state = LoadLicenseState();
+        if (state.FullLicensePurchased || Environment.GetEnvironmentVariable("SIMPLEFOLDERSYNC_FULL_LICENSE") == "1")
+        {
+            state.FullLicensePurchased = true;
+            _isTrialExpired = false;
+            SaveLicenseState(state);
+            LicenseStatusText.Text = "License: Full version";
+            TrialRemainingText.Text = "Licensed (Microsoft Store)";
+            PricingText.Text = "Full license purchased in Microsoft Store ($1.99).";
+            ApplyPlanButton.IsEnabled = true;
+            return;
+        }
+
+        var daysUsed = (DateTime.UtcNow - state.FirstRunUtc).TotalDays;
+        var remaining = TrialDays - (int)Math.Ceiling(daysUsed);
+        _isTrialExpired = remaining <= 0;
+
+        LicenseStatusText.Text = "License: Trial";
+        TrialRemainingText.Text = remaining > 0
+            ? $"Trial remaining: {remaining} day(s)"
+            : "Trial ended. Purchase required.";
+        PricingText.Text = remaining > 0
+            ? $"Trial is fully functional for 15 days. Upgrade in Microsoft Store ($1.99) to continue after {remaining} remaining day(s)."
+            : "Upgrade in Microsoft Store for $1.99 to continue.";
+
+        ApplyPlanButton.IsEnabled = !_isTrialExpired;
+        BuildPlanButton.IsEnabled = true;
+    }
+
+    private LicenseState LoadLicenseState()
+    {
+        if (!File.Exists(_licenseStateFile))
+        {
+            var fresh = new LicenseState { FirstRunUtc = DateTime.UtcNow, FullLicensePurchased = false };
+            SaveLicenseState(fresh);
+            return fresh;
+        }
+
+        try
+        {
+            var raw = File.ReadAllText(_licenseStateFile);
+            var parsed = JsonSerializer.Deserialize<LicenseState>(raw);
+            if (parsed != null && parsed.FirstRunUtc != default)
+            {
+                return parsed;
+            }
+        }
+        catch
+        {
+            // fallback handled below
+        }
+
+        var fallback = new LicenseState { FirstRunUtc = DateTime.UtcNow, FullLicensePurchased = false };
+        SaveLicenseState(fallback);
+        return fallback;
+    }
+
+    private void SaveLicenseState(LicenseState state)
+    {
+        try
+        {
+            File.WriteAllText(_licenseStateFile, JsonSerializer.Serialize(state, new JsonSerializerOptions { WriteIndented = true }));
+        }
+        catch
+        {
+            // non-blocking
+        }
     }
 
     private void OnChooseSource(object sender, RoutedEventArgs e)
@@ -80,6 +178,14 @@ public partial class MainWindow : Window
 
     private async void OnBuildPlan(object sender, RoutedEventArgs e)
     {
+        if (_isTrialExpired)
+        {
+            var msg = "Trial has expired. Upgrade to full version in Microsoft Store to continue.";
+            AddActivity(msg);
+            global::System.Windows.MessageBox.Show(msg, "Trial expired", global::System.Windows.MessageBoxButton.OK, global::System.Windows.MessageBoxImage.Warning);
+            return;
+        }
+
         _plans.Clear();
         AddActivity("Building sync plan...");
         var source = SourcePathTextBox.Text;
@@ -109,6 +215,14 @@ public partial class MainWindow : Window
 
     private async void OnApplyPlan(object sender, RoutedEventArgs e)
     {
+        if (_isTrialExpired)
+        {
+            var msg = "Trial expired. Apply is blocked until full license is active.";
+            AddActivity(msg);
+            global::System.Windows.MessageBox.Show(msg, "Trial expired", global::System.Windows.MessageBoxButton.OK, global::System.Windows.MessageBoxImage.Warning);
+            return;
+        }
+
         if (_plans.Count == 0)
         {
             AddActivity("No plan to apply. Build a plan first.");
@@ -116,7 +230,7 @@ public partial class MainWindow : Window
         }
 
         if (global::System.Windows.MessageBox.Show(
-                "Apply this plan now? Conflicts will be skipped by default unless manually resolved by editing files.",
+                "Apply this plan now? Conflicts are skipped by default.",
                 "Apply Sync Plan",
                 global::System.Windows.MessageBoxButton.YesNo,
                 global::System.Windows.MessageBoxImage.Warning) != global::System.Windows.MessageBoxResult.Yes)
@@ -127,6 +241,7 @@ public partial class MainWindow : Window
 
         var backupRoot = GetOrCreateBackupFolder();
         var executed = 0;
+
         foreach (var item in _plans.ToList())
         {
             try
@@ -139,7 +254,7 @@ public partial class MainWindow : Window
 
                 ApplyPlanItem(item, backupRoot);
                 executed++;
-                AddActivity($"Applied: {item.Action} - {item.RelativePath}");
+                AddActivity($"Applied: {item.ActionText} - {item.RelativePath}");
             }
             catch (Exception ex)
             {
@@ -148,12 +263,14 @@ public partial class MainWindow : Window
         }
 
         AddActivity($"Apply complete. {executed} operations executed.");
+
         var refreshed = await BuildPlanAsync(source: SourcePathTextBox.Text, target: TargetPathTextBox.Text);
         _plans.Clear();
         foreach (var item in refreshed)
         {
             _plans.Add(item);
         }
+
         SummaryText.Text = $"{BuildSummary(refreshed)} (after apply)";
         AddActivity("Plan refreshed after apply.");
     }
@@ -162,6 +279,34 @@ public partial class MainWindow : Window
     {
         _activity.Clear();
         AddActivity("Log cleared.");
+    }
+
+    private void OnOpenBackupFolder(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            Directory.CreateDirectory(_backupRoot);
+            Process.Start(new ProcessStartInfo("explorer.exe", $"\"{_backupRoot}\"") { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            AddActivity($"Failed to open backup folder: {ex.Message}");
+            global::System.Windows.MessageBox.Show($"Could not open backup folder: {ex.Message}", "Open Backup Folder", global::System.Windows.MessageBoxButton.OK, global::System.Windows.MessageBoxImage.Error);
+        }
+    }
+
+    private void OnViewLogs(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            Directory.CreateDirectory(_logsDirectory);
+            Process.Start(new ProcessStartInfo("explorer.exe", $"\"{_logsDirectory}\"") { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            AddActivity($"Failed to open logs folder: {ex.Message}");
+            global::System.Windows.MessageBox.Show($"Could not open logs folder: {ex.Message}", "View Logs", global::System.Windows.MessageBoxButton.OK, global::System.Windows.MessageBoxImage.Error);
+        }
     }
 
     private string BuildSummary(IReadOnlyList<SyncPlanItem> plan)
@@ -180,7 +325,7 @@ public partial class MainWindow : Window
             return string.Empty;
         }
 
-        var root = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Backups", DateTime.Now.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture));
+        var root = Path.Combine(_backupRoot, DateTime.UtcNow.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture));
         Directory.CreateDirectory(root);
         return root;
     }
@@ -217,7 +362,12 @@ public partial class MainWindow : Window
                 {
                     if (DeleteMissingTarget?.IsChecked == true)
                     {
-                        results.Add(new SyncPlanItem(key, PlannedActionType.Delete, "Delete target-only", targetPath: Path.Combine(target, key), details: "Only in target; delete to mirror source."));
+                        results.Add(new SyncPlanItem(
+                            key,
+                            PlannedActionType.Delete,
+                            "Delete target-only",
+                            targetPath: Path.Combine(target, key),
+                            details: "Only in target; delete to mirror source."));
                     }
                     else
                     {
@@ -226,15 +376,14 @@ public partial class MainWindow : Window
                     continue;
                 }
 
-                // two-way: copy target file to source
                 if (targetByName.TryGetValue(key, out var missingFromSourceInTwoWay))
                 {
                     results.Add(new SyncPlanItem(
                         key,
                         PlannedActionType.AddOrCopy,
-                        "Copy target → source",
-                        targetPath: missingFromSourceInTwoWay.FullPath,
+                        "Copy target -> source",
                         sourcePath: Path.Combine(source, key),
+                        targetPath: missingFromSourceInTwoWay.FullPath,
                         details: "Item exists only in target."));
                 }
                 continue;
@@ -245,7 +394,7 @@ public partial class MainWindow : Window
                 results.Add(new SyncPlanItem(
                     key,
                     PlannedActionType.AddOrCopy,
-                    "Copy source → target",
+                    "Copy source -> target",
                     sourcePath: sourceItem.FullPath,
                     targetPath: Path.Combine(target, key),
                     details: "New item in target."));
@@ -264,16 +413,16 @@ public partial class MainWindow : Window
                     }
                     else if (sourceWrite > targetWrite)
                     {
-                        results.Add(new SyncPlanItem(key, PlannedActionType.Update, "Copy newer source → target", sourcePath: sourceItem.FullPath, targetPath: targetItem.FullPath, details: $"Source is newer ({sourceWrite:u})."));
+                        results.Add(new SyncPlanItem(key, PlannedActionType.Update, "Copy newer source -> target", sourcePath: sourceItem.FullPath, targetPath: targetItem.FullPath, details: $"Source is newer ({sourceWrite:u})."));
                     }
                     else
                     {
-                        results.Add(new SyncPlanItem(key, PlannedActionType.Update, "Copy newer target → source", sourcePath: targetItem.FullPath, targetPath: sourceItem.FullPath, details: $"Target is newer ({targetWrite:u})."));
+                        results.Add(new SyncPlanItem(key, PlannedActionType.Update, "Copy newer target -> source", sourcePath: targetItem.FullPath, targetPath: sourceItem.FullPath, details: $"Target is newer ({targetWrite:u})."));
                     }
                 }
                 else
                 {
-                    var action = sourceItem.LastWriteUtc > targetItem.LastWriteUtc ? "Update target" : "Copy source → target";
+                    var action = sourceItem.LastWriteUtc > targetItem.LastWriteUtc ? "Update target" : "Copy source -> target";
                     results.Add(new SyncPlanItem(key, PlannedActionType.Update, action, sourcePath: sourceItem.FullPath, targetPath: targetItem.FullPath, details: "Source/target differ."));
                 }
             }
@@ -323,19 +472,20 @@ public partial class MainWindow : Window
                     File.Copy(item.SourcePath, item.TargetPath, overwrite: true);
                 }
                 break;
+
             case PlannedActionType.Delete:
-                if (item.SourcePath is not null && File.Exists(item.SourcePath) && !string.IsNullOrWhiteSpace(backupRoot))
+                if (item.TargetPath is not null && File.Exists(item.TargetPath) && !string.IsNullOrWhiteSpace(backupRoot))
                 {
-                    Backup(item.SourcePath, backupRoot);
+                    Backup(item.TargetPath, backupRoot);
                 }
 
-                if (item.SourcePath is not null && Directory.Exists(item.SourcePath))
+                if (item.TargetPath is not null && Directory.Exists(item.TargetPath))
                 {
-                    Directory.Delete(item.SourcePath, recursive: true);
+                    Directory.Delete(item.TargetPath, recursive: true);
                 }
-                else if (item.SourcePath is not null)
+                else if (item.TargetPath is not null)
                 {
-                    File.Delete(item.SourcePath);
+                    File.Delete(item.TargetPath);
                 }
                 break;
         }
@@ -343,9 +493,12 @@ public partial class MainWindow : Window
 
     private void Backup(string sourcePath, string backupRoot)
     {
-        if (string.IsNullOrWhiteSpace(backupRoot)) return;
+        if (string.IsNullOrWhiteSpace(backupRoot))
+        {
+            return;
+        }
 
-        var relativePath = Path.GetRelativePath(AppDomain.CurrentDomain.BaseDirectory, sourcePath)
+        var relativePath = Path.GetRelativePath(_appDataRoot, sourcePath)
             .Replace(Path.DirectorySeparatorChar, '_')
             .Replace(Path.AltDirectorySeparatorChar, '_');
         var dest = Path.Combine(backupRoot, relativePath);
@@ -394,8 +547,9 @@ public partial class MainWindow : Window
 
     private static bool ShouldProcessPath(string directoryName)
     {
-        return !DefaultExcludeDirs.Any(ex => directoryName.Contains(Path.DirectorySeparatorChar + ex, StringComparison.OrdinalIgnoreCase) ||
-                                              directoryName.Contains(Path.AltDirectorySeparatorChar + ex, StringComparison.OrdinalIgnoreCase));
+        return !DefaultExcludeDirs.Any(ex =>
+            directoryName.Contains(Path.DirectorySeparatorChar + ex, StringComparison.OrdinalIgnoreCase) ||
+            directoryName.Contains(Path.AltDirectorySeparatorChar + ex, StringComparison.OrdinalIgnoreCase));
     }
 
     private HashSet<string> ParseExtensions(string input)
@@ -409,10 +563,11 @@ public partial class MainWindow : Window
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Select(t => t.Trim().ToLowerInvariant())
             .Where(t => !string.IsNullOrWhiteSpace(t));
+
         var normalized = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var token in tokens)
         {
-            if (token == "*.*" || token == "*" )
+            if (token == "*.*" || token == "*")
             {
                 normalized.Add("*.*");
                 continue;
@@ -427,22 +582,38 @@ public partial class MainWindow : Window
             normalized.Add(token.StartsWith('.') ? token : "." + token);
         }
 
-        if (normalized.Count > 0)
-        {
-            return normalized;
-        }
-
-        return new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "*.*" };
+        return normalized.Count > 0 ? normalized : new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "*.*" };
     }
 
     private void AddActivity(string message)
     {
-        var entry = $"{DateTime.Now:t} {message}";
+        var entry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {message}";
         _activity.Insert(0, entry);
+        WriteLog(entry);
         if (_activity.Count > 400)
         {
             _activity.RemoveAt(_activity.Count - 1);
         }
+    }
+
+    private void WriteLog(string message)
+    {
+        try
+        {
+            var logFile = GetCurrentLogFile();
+            lock (_logSync)
+            {
+                File.AppendAllText(logFile, $"{message}{Environment.NewLine}");
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    private string GetCurrentLogFile()
+    {
+        return Path.Combine(_logsDirectory, $"{DateTime.UtcNow:yyyy-MM-dd}.log");
     }
 
     private class FileMetadata
@@ -471,5 +642,19 @@ public partial class MainWindow : Window
         public string? SourcePath { get; }
         public string? TargetPath { get; }
         public string Details { get; }
+        public string ActionText => Action switch
+        {
+            PlannedActionType.AddOrCopy => "AddOrCopy",
+            PlannedActionType.Update => "Update",
+            PlannedActionType.Delete => "Delete",
+            PlannedActionType.Conflict => "Conflict",
+            _ => Action.ToString()
+        };
+    }
+
+    private sealed class LicenseState
+    {
+        public DateTime FirstRunUtc { get; set; }
+        public bool FullLicensePurchased { get; set; }
     }
 }

@@ -2,18 +2,31 @@
 
 ## Short description
 
-Plan safe one-way or two-way folder syncs.
+Simple Folder Sync - safe folder sync with review-first workflow.
 
 ## Full description
 
-Simple Folder Sync is a Windows utility designed around a simple, local-first workflow. The initial app gives users a clear starting surface for choose source and target folders, compare changes, review planned copies, and sync intentionally.
+Simple Folder Sync is a practical Windows desktop utility for folder synchronization with an explicit review step before any writes happen.
+
+- Pick source and target folders.
+- Select one-way or two-way mode.
+- Filter by extension and include/exclude hidden files.
+- Build a visual plan, review every operation, then apply when ready.
+- Keep local backups of changed files before writes or deletions.
+- Get local activity logs for support and troubleshooting.
+
+Trial and licensing:
+- 15-day fully functional trial is enabled by default on first launch.
+- After trial expiry, you can still inspect plans, but applying changes is disabled.
+- Full functionality unlocks with Microsoft Store purchase ($1.99 USD).
 
 ## Feature bullets
 
 - Source and target folder setup
-- Copy/update/delete planning
-- Conflict review surface
-- Local-only sync notes
+- Copy/update/delete planning with conflict detection
+- Persistent in-app activity log with file output
+- Backup protection before overwrite/delete
+- About page with current trial/full status and usage guidance
 
 ## Keywords
 

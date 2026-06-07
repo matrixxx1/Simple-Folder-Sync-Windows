@@ -1,5 +1,11 @@
 Simple Folder Sync Privacy Policy
 
-Simple Folder Sync is designed as a local Windows utility. This initial version does not require an account, does not send user files to a cloud service, and does not sell personal data.
+Simple Folder Sync is a local-first Windows utility. The app does not require a user account and does not include user log-in or cloud synchronization.
 
-Data handled by the app remains on the user's device unless the user separately chooses to export or share files through Windows.
+We do not send or store your personal files on our servers. Folder contents and operation data remain on your device unless you explicitly choose to export data through standard Windows file actions.
+
+The app may write local logs (for trial status, sync planning, and error reporting) to your local machine to support troubleshooting and support. You can clear these logs from the app at any time.
+
+If you contact support, you may send log text or screenshots at your discretion to help us resolve issues. We do not sell or share that information for advertising or data brokers.
+
+For support, contact: m3 Coding.

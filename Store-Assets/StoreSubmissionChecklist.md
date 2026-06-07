@@ -1,9 +1,29 @@
 # Store Submission Checklist
 
 - Reserve the exact app name in Partner Center.
+- Reserve pricing at USD 1.99 and confirm 15-day trial notes.
+- Store identity values from reservation:
+  - Store ID: 9P2QL9F40TXX
+  - Package Name: m3Coding.SimpleFolderSync
+  - Publisher: CN=AFF85DD5-3D92-42A5-BA39-3AF6D41B1837
+  - Publisher display name: m3 Coding
+  - Package Family Name (PFN): m3Coding.SimpleFolderSync_8srffngrg4x08
 - Update MSIX package identity after reservation.
-- Generate final app icon and Store artwork.
+- Generate final app icon and Store artwork:
+  - Square44x44Logo.png (44x44)
+  - Square150x150Logo.png (150x150)
+  - Square310x310Logo.png (310x310) if needed by your manifest
+  - Wide310x150Logo.png (310x150)
+  - StoreLogo.png (300x300)
+  - Icon file for package submission.
 - Capture screenshots from the running app.
-- Build and verify the MSIX or MSIXUPLOAD package.
+- Build and verify the MSIX package.
+- Add required metadata:
+  - Trial wording ($1.99 full version, 15-day trial)
+  - PrivacyPolicy.txt
+  - Release notes and app version.
+- Capture at least 2 screenshots:
+  - sync-home (main workflow)
+  - sync-about-license (about panel with trial/version status)
 - Upload package, screenshots, listing text, and privacy policy in Partner Center.
 - Confirm age rating and additional testing notes.

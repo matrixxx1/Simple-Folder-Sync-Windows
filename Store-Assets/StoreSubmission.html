@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple Folder Sync - Microsoft Store Submission</title>
+  <style>
+    :root { font-family: "Segoe UI", Tahoma, Arial, sans-serif; }
+    body { margin: 0; padding: 24px; background: #f5f7ff; color: #111827; }
+    .wrap { max-width: 980px; margin: 0 auto; display: grid; gap: 18px; }
+    section { background: white; border-radius: 14px; padding: 18px; box-shadow: 0 2px 10px rgba(15,23,42,0.08); }
+    h1, h2 { margin: 0 0 10px 0; }
+    .row { display: flex; align-items: start; gap: 10px; margin: 8px 0; }
+    .label { font-weight: 600; min-width: 240px; white-space: nowrap; }
+    .block { margin: 8px 0; }
+    textarea { width: 100%; min-height: 82px; font: inherit; resize: vertical; padding: 8px; border: 1px solid #d1d5db; border-radius: 8px; background: #f8fafc; }
+    .copy-btn { padding: 8px 12px; border: 0; border-radius: 8px; background: #2563eb; color: white; cursor: pointer; }
+    .copy-btn:active { transform: translateY(1px); }
+    .feature-item { margin: 8px 0; display: flex; align-items: center; gap: 10px; }
+    .badge { display:inline-block; background:#e5e7eb; border-radius: 999px; padding: 3px 10px; font-size: 12px; margin-right: 6px; }
+    .ok { color: #047857; font-size: 12px; }
+    .small { font-size: 13px; color: #4b5563; }
+    ul { margin: 6px 0 0 22px; }
+    code { background: #f3f4f6; padding: 2px 4px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section>
+      <h1>Simple Folder Sync - Microsoft Store Copy Sheet</h1>
+      <p class="small">Use these answers directly when filling Partner Center forms. Click any <strong>Copy</strong> button to place the response in clipboard.</p>
+      <p class="small">Product identity used for this submission: <code>Simple Folder Sync</code> / <code>m3Coding.SimpleFolderSync</code> / PFN <code>m3Coding.SimpleFolderSync_8srffngrg4x08</code> / Store ID <code>9P2QL9F40TXX</code></p>
+    </section>
+
+    <section>
+      <h2>Pricing and availability</h2>
+      <div class="row"><span class="label">Currency (defaults)</span><textarea id="currency">USD - United States</textarea><button class="copy-btn" onclick="copyText('currency')">Copy</button></div>
+      <div class="row"><span class="label">Price</span><textarea id="price">$1.99 USD</textarea><button class="copy-btn" onclick="copyText('price')">Copy</button></div>
+      <div class="row"><span class="label">Trial</span><textarea id="trial">Yes, 15-day fully functional free trial (trial option enabled by default; trial-to-full upgrade available in app and Store flow)</textarea><button class="copy-btn" onclick="copyText('trial')">Copy</button></div>
+      <p class="small ok">Use defaults unless you want to narrow markets.</p>
+    </section>
+
+    <section>
+      <h2>Properties</h2>
+      <div class="row"><span class="label">Category</span><textarea id="category">Utilities</textarea><button class="copy-btn" onclick="copyText('category')">Copy</button></div>
+      <div class="row"><span class="label">Subcategory</span><textarea id="subcategory">File managers</textarea><button class="copy-btn" onclick="copyText('subcategory')">Copy</button></div>
+      <div class="row"><span class="label">Privacy policy text</span><textarea id="privacyText">Simple Folder Sync is a local-first Windows utility. The app does not require a user account and does not include user log-in or cloud synchronization.
+
+We do not send or store your personal files on our servers. Folder contents and operation data remain on your device unless you explicitly choose to export data through standard Windows file actions.
+
+The app may write local logs (for trial status, sync planning, and error reporting) to your local machine to support troubleshooting and support. You can clear these logs from the app at any time.
+
+If you contact support, you may send log text or screenshots at your discretion to help us resolve issues. We do not sell or share that information for advertising or data brokers.</textarea><button class="copy-btn" onclick="copyText('privacyText')">Copy</button></div>
+      <p class="small">Developer name: <strong>m3 Coding</strong></p>
+    </section>
+
+    <section>
+      <h2>Store Listings</h2>
+      <div class="block">
+        <span class="label">Short title</span>
+        <div class="row">
+          <textarea id="shortTitle">Simple Folder Sync</textarea>
+          <button class="copy-btn" onclick="copyText('shortTitle')">Copy</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <span class="label">Short description</span>
+        <div class="row">
+          <textarea id="shortDescription">Safe folder synchronization with a review-first workflow and local logs, plus built-in trial and licensing status.</textarea>
+          <button class="copy-btn" onclick="copyText('shortDescription')">Copy</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <span class="label">Full description</span>
+        <div class="row">
+          <textarea id="fullDescription">Simple Folder Sync helps you keep folders aligned without surprises.
+
+Use a simple two-pane workflow to choose a Source and a Destination, review every planned operation first, then apply changes when you approve the plan.
+
+Whether you need one-way backups or controlled two-way updates, the app gives you clear change previews, backup-safe behavior, and easy error visibility. Perfect for files, project directories, and recurring maintenance.
+
+The 15-day fully functional free trial lets you test every feature before purchase. After the trial, users can still view plans and status and upgrade to unlock unrestricted use. A built-in About page clearly shows trial vs full status and usage guidance.</textarea>
+          <button class="copy-btn" onclick="copyText('fullDescription')">Copy</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <span class="label">Top 5 features</span>
+        <div class="feature-item"><span class="badge">1</span><textarea id="feature1">One-way and two-way folder synchronization with explicit plan generation.</textarea><button class="copy-btn" onclick="copyText('feature1')">Copy</button></div>
+        <div class="feature-item"><span class="badge">2</span><textarea id="feature2">Review-first interface that shows planned copy/update/delete actions before writing changes.</textarea><button class="copy-btn" onclick="copyText('feature2')">Copy</button></div>
+        <div class="feature-item"><span class="badge">3</span><textarea id="feature3">Conflict detection and logging for traceable, predictable folder updates.</textarea><button class="copy-btn" onclick="copyText('feature3')">Copy</button></div>
+        <div class="feature-item"><span class="badge">4</span><textarea id="feature4">15-day fully functional trial and clear full-version/ trial-state messaging in About page.</textarea><button class="copy-btn" onclick="copyText('feature4')">Copy</button></div>
+        <div class="feature-item"><span class="badge">5</span><textarea id="feature5">Quick log access from the app (including a button to view logs next to licensing info).</textarea><button class="copy-btn" onclick="copyText('feature5')">Copy</button></div>
+      </div>
+
+      <div class="block">
+        <span class="label">Copyright / trademark</span>
+        <div class="row">
+          <textarea id="copyright">© 2026 m3 Coding. Simple Folder Sync is a trademark of m3 Coding. All rights reserved.</textarea>
+          <button class="copy-btn" onclick="copyText('copyright')">Copy</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Assets and package</h2>
+      <ul class="small">
+        <li>MSIX package: <code>Store-Assets\\m3Coding.SimpleFolderSync_0.1.0.0_x64.msix</code></li>
+        <li>MSIX upload: <code>Store-Assets\\m3Coding.SimpleFolderSync_0.1.0.0_x64.msixupload</code></li>
+        <li>App icon (300x300): <code>Store-Assets\\AppIcon-300x300.png</code></li>
+        <li>Poster art (720x1080): <code>Store-Assets\\Poster-720x1080.png</code></li>
+        <li>Super hero (1920x1080): <code>Store-Assets\\Hero-1920x1080.png</code></li>
+        <li>Screenshots: <code>Store-Assets\\screenshot-main.png</code>, <code>Store-Assets\\screenshot-license.png</code>, <code>Store-Assets\\screenshot-logs.png</code></li>
+      </ul>
+      <p class="small ok">All handoff files live directly in <code>Store-Assets</code>.</p>
+    </section>
+  </div>
+
+  <script>
+    async function copyText(id) {
+      const el = document.getElementById(id);
+      const text = el.value || el.textContent || '';
+      try {
+        await navigator.clipboard.writeText(text);
+        const old = event.target.textContent;
+        event.target.textContent = 'Copied!';
+        setTimeout(() => event.target.textContent = old, 900);
+      } catch (err) {
+        const input = document.createElement('textarea');
+        input.value = text;
+        input.style.position = 'fixed';
+        input.style.opacity = 0;
+        document.body.appendChild(input);
+        input.select();
+        try { document.execCommand('copy'); } finally { document.body.removeChild(input); }
+        const old = event.target.textContent;
+        event.target.textContent = 'Copied!';
+        setTimeout(() => event.target.textContent = old, 900);
+      }
+    }
+  </script>
+</body>
+</html>
