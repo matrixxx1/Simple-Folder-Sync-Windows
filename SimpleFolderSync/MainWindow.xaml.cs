@@ -190,6 +190,9 @@ public partial class MainWindow : Window
         AddActivity("Building sync plan...");
         var source = SourcePathTextBox.Text;
         var target = TargetPathTextBox.Text;
+        var syncMode = SyncModeCombo.SelectedIndex == 1 ? SyncMode.TwoWay : SyncMode.OneWay;
+        var includeHidden = IncludeHiddenFiles?.IsChecked == true;
+        var extensionSpec = ExtensionFilterTextBox.Text;
 
         if (!Directory.Exists(source) || !Directory.Exists(target))
         {
@@ -199,7 +202,7 @@ public partial class MainWindow : Window
 
         try
         {
-            var plan = await BuildPlanAsync(source, target);
+            var plan = await BuildPlanAsync(source, target, syncMode, includeHidden, extensionSpec);
             foreach (var item in plan)
             {
                 _plans.Add(item);
@@ -264,7 +267,10 @@ public partial class MainWindow : Window
 
         AddActivity($"Apply complete. {executed} operations executed.");
 
-        var refreshed = await BuildPlanAsync(source: SourcePathTextBox.Text, target: TargetPathTextBox.Text);
+        var syncMode = SyncModeCombo.SelectedIndex == 1 ? SyncMode.TwoWay : SyncMode.OneWay;
+        var includeHidden = IncludeHiddenFiles?.IsChecked == true;
+        var extensionSpec = ExtensionFilterTextBox.Text;
+        var refreshed = await BuildPlanAsync(source: SourcePathTextBox.Text, target: TargetPathTextBox.Text, mode: syncMode, includeHidden: includeHidden, extensionFilter: extensionSpec);
         _plans.Clear();
         foreach (var item in refreshed)
         {
@@ -330,17 +336,14 @@ public partial class MainWindow : Window
         return root;
     }
 
-    private async Task<List<SyncPlanItem>> BuildPlanAsync(string source, string target)
+    private async Task<List<SyncPlanItem>> BuildPlanAsync(string source, string target, SyncMode mode, bool includeHidden, string extensionFilter)
     {
-        return await Task.Run(() => BuildPlan(source, target));
+        return await Task.Run(() => BuildPlan(source, target, mode, includeHidden, extensionFilter));
     }
 
-    private List<SyncPlanItem> BuildPlan(string source, string target)
+    private List<SyncPlanItem> BuildPlan(string source, string target, SyncMode mode, bool includeHidden, string extensionFilter)
     {
-        var mode = SyncModeCombo.SelectedIndex == 1 ? SyncMode.TwoWay : SyncMode.OneWay;
-        var includeHidden = IncludeHiddenFiles?.IsChecked == true;
-        var extensionSpec = ExtensionFilterTextBox.Text;
-        var allowedExtensions = ParseExtensions(extensionSpec);
+        var allowedExtensions = ParseExtensions(extensionFilter);
 
         var sourceFiles = ListFiles(source, includeHidden, allowedExtensions);
         var targetFiles = ListFiles(target, includeHidden, allowedExtensions);

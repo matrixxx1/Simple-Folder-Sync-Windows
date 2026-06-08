@@ -1,4 +1,4 @@
-# Partner Center Fill-Ready Packet (Simple Folder Sync)
+ï»¿# Partner Center Fill-Ready Packet (Simple Folder Sync)
 
 Use this as a direct copy target for each form in Partner Center.
 
@@ -47,19 +47,19 @@ Use this as a direct copy target for each form in Partner Center.
 - `Simple folder sync with review-first workflow and full/Trial licensing controls.`
 
 ### Description
-- `Simple Folder Sync is a practical Windows desktop utility for folder synchronization with an explicit review step before any writes happen.
-
-- Pick source and target folders.
-- Choose one-way or two-way sync mode.
-- Filter by extension and include/exclude hidden files.
-- Build a visual plan, review every operation, then apply when ready.
-- Keep local backups of changed files before overwrite/delete.
-- Trial-first mode is available by default; full feature use is available after purchase. 15-day fully functional trial is enabled.`
+- `Simple Folder Sync requires the .NET 8.0 Desktop Runtime to run. Microsoft Store handles this dependency through framework provisioning.`
+- `Simple Folder Sync is a practical Windows desktop utility for folder synchronization with an explicit review step before any writes happen.`
+- `Pick source and target folders.`
+- `Choose one-way or two-way sync mode.`
+- `Filter by extension and include/exclude hidden files.`
+- `Build a visual plan, review every operation, then apply when ready.`
+- `Keep local backups of changed files before overwrite/delete.`
+- `Trial-first mode is available by default; full feature use is available after purchase. 15-day fully functional trial is enabled.`
 
 ### Privacy headline / terms
 - `Local-first utility. Files stay on your machine. No account or cloud sync required.`
 
-### What’s new
+### Whatâ€™s new
 - `Initial Microsoft Store release of Simple Folder Sync with folder selection, plan review, conflict display, backup-protected apply, and local logging.`
 
 ### Product features (bullets)
@@ -73,7 +73,7 @@ Use this as a direct copy target for each form in Partner Center.
 - `folder sync, file backup, file comparison, local utility, desktop sync, review before apply`
 
 ### Copyright / trademark
-- `© 2026 m3 Coding. All rights reserved.`
+- `Copyright 2026 m3 Coding. All rights reserved.`
 
 ### Developed by
 - `m3 Coding`

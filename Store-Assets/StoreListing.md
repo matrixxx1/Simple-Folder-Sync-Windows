@@ -6,6 +6,8 @@ Simple Folder Sync - safe folder sync with review-first workflow.
 
 ## Full description
 
+Simple Folder Sync requires the .NET 8.0 Desktop Runtime to run. This requirement is installed by Microsoft Store framework components when needed.
+
 Simple Folder Sync is a practical Windows desktop utility for folder synchronization with an explicit review step before any writes happen.
 
 - Pick source and target folders.
