@@ -8,7 +8,7 @@ Use this as a direct copy target for each form in Partner Center.
 - Package Identity Name: m3Coding.SimpleFolderSync
 - Publisher: CN=AFF85DD5-3D92-42A5-BA39-3AF6D41B1837
 - PFN: m3Coding.SimpleFolderSync_8srffngrg4x08
-- Upload package: `C:\Github\Simple Folder Sync-Windows\Store-Assets\Output\m3Coding.SimpleFolderSync_0.1.0.0_x64.msixupload`
+- Upload package: `C:\Github\Simple Folder Sync-Windows\Store-Assets\Output\m3Coding.SimpleFolderSync_0.1.1.0_x64.msixupload`
 
 ## 2) Pricing and availability
 - Price: `$1.99 USD`
@@ -104,4 +104,4 @@ Use this as a direct copy target for each form in Partner Center.
 ## 10) Recommended post-upload check list
 - Re-open: Pricing, Properties, Age ratings, Store listings, Additional testing information, Submission options, Packages.
 - Confirm each section is Complete.
-- Confirm package validation passes and package architecture/version shown as x64, version 0.1.0.0.
+- Confirm package validation passes and package architecture/version shown as x64, version 0.1.1.0.

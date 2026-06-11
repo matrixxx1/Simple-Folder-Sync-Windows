@@ -12,7 +12,7 @@
   <Identity
     Name="m3Coding.SimpleFolderSync"
     Publisher="CN=AFF85DD5-3D92-42A5-BA39-3AF6D41B1837"
-    Version="0.1.1.0"
+    Version="0.1.0.0"
     ProcessorArchitecture="x64" />
 
   <Properties>

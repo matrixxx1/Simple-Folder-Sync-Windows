@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" xmlns:mp="http://schemas.microsoft.com/WindowsPhone/Mobile/Appx/Deployment" xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10" xmlns:desktop2="http://schemas.microsoft.com/appx/manifest/desktop/windows10/2" xmlns:desktop3="http://schemas.microsoft.com/appx/manifest/desktop/windows10/3" IgnorableNamespaces="rescap">
+  <Identity Name="m3Coding.SimpleFolderSync" Publisher="CN=AFF85DD5-3D92-42A5-BA39-3AF6D41B1837" Version="0.1.1.0" ProcessorArchitecture="x64" />
+  <Properties>
+    <DisplayName>Simple Folder Sync</DisplayName>
+    <PublisherDisplayName>m3 Coding</PublisherDisplayName>
+    <Logo>StoreLogo.png</Logo>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.17763.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+  <Applications>
+    <Application Id="SimpleFolderSync" Executable="SimpleFolderSync.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements DisplayName="Simple Folder Sync" Square150x150Logo="Square150x150Logo.png" Square44x44Logo="Square44x44Logo.png" Description="Simple Folder Sync" BackgroundColor="transparent">
+        <uap:DefaultTile Wide310x150Logo="Wide310x150Logo.png" Square310x310Logo="Square310x310Logo.png" />
+        <uap:SplashScreen Image="StoreLogo.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <!-- Keep this list minimal and add only what is required for your app model. -->
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>

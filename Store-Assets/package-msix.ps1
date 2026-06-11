@@ -2,7 +2,7 @@ param(
     [string]$ProjectPath = (Join-Path $PSScriptRoot '..\SimpleFolderSync\SimpleFolderSync.csproj'),
     [string]$Configuration = "Release",
     [string]$Runtime = "win-x64",
-    [string]$PackageVersion = "0.1.0.0",
+    [string]$PackageVersion = "0.1.1.0",
     [string]$PackageName = "m3Coding.SimpleFolderSync",
     [string]$Publisher = "CN=AFF85DD5-3D92-42A5-BA39-3AF6D41B1837",
     [string]$OutputRoot = (Join-Path $PSScriptRoot 'Output'),
@@ -113,12 +113,19 @@ Invoke-Checked -ActionName "Publishing .NET app" -Action {
     dotnet publish $ProjectPath -c $Configuration -r $Runtime --no-self-contained /p:PublishReadyToRun=false /p:PublishSingleFile=false -o $publishDir
 }
 
-Get-ChildItem -Path $publishDir | Copy-Item -Recurse -Force -Destination $packageImage
+Get-ChildItem -Path $publishDir -Filter 'SimpleFolderSync.exe' -File | Copy-Item -Destination $packageImage -Force
+Get-ChildItem -Path $publishDir -Filter 'SimpleFolderSync.dll' -File | Copy-Item -Destination $packageImage -Force
+Get-ChildItem -Path $publishDir -Filter 'SimpleFolderSync.pdb' -File | Copy-Item -Destination $packageImage -Force
+Get-ChildItem -Path $publishDir -Filter 'SimpleFolderSync.deps.json' -File | Copy-Item -Destination $packageImage -Force
+Get-ChildItem -Path $publishDir -Filter 'SimpleFolderSync.runtimeconfig.json' -File | Copy-Item -Destination $packageImage -Force
 Copy-Item -Path $manifestSource -Destination (Join-Path $packageImage 'AppxManifest.xml') -Force
-Copy-Item -Path (Join-Path $storeAssets '*.png') -Destination $packageImage -Force
+Copy-Item -Path (Join-Path $storeAssets 'StoreLogo.png') -Destination $packageImage -Force
+Copy-Item -Path (Join-Path $storeAssets 'Square44x44Logo.png') -Destination $packageImage -Force
+Copy-Item -Path (Join-Path $storeAssets 'Square150x150Logo.png') -Destination $packageImage -Force
+Copy-Item -Path (Join-Path $storeAssets 'Square310x310Logo.png') -Destination $packageImage -Force
+Copy-Item -Path (Join-Path $storeAssets 'Wide310x150Logo.png') -Destination $packageImage -Force
 
 Copy-Item -Path (Join-Path $projectDir 'Assets\folder-sync.ico') -Destination (Join-Path $packageImage 'folder-sync.ico') -Force
-Copy-Item -Path (Join-Path $projectDir 'Assets\folder-sync.png') -Destination (Join-Path $packageImage 'folder-sync.png') -Force
 
 $updatedManifest = Join-Path $packageImage 'AppxManifest.xml'
 $manifestXml = [xml](Get-Content $updatedManifest -Raw)
@@ -132,7 +139,7 @@ $manifestXml.Save($updatedManifest)
 
 Push-Location $packageImage
 Invoke-Checked -ActionName "Packing MSIX" -Action {
-    & $makeappx pack /h SHA256 /d . /p $msixOutput
+    & $makeappx pack /o /h SHA256 /d . /p $msixOutput
 }
 Pop-Location
 
@@ -157,7 +164,14 @@ if (Test-Path $msixOutput) {
 }
 
 $msixUploadOutput = Join-Path $OutputRoot "$PackageName`_$PackageVersion`_x64.msixupload"
-Copy-Item $msixOutput $msixUploadOutput -Force
+if (Test-Path $msixUploadOutput) {
+    Remove-Item $msixUploadOutput -Force
+}
+
+# Microsoft Store expects the upload to be an archive container holding the app package.
+# Keep this as an archive (not a raw extracted MSIX payload).
+Compress-Archive -Path $msixOutput -DestinationPath "$msixUploadOutput.zip" -Force
+Move-Item -Path "$msixUploadOutput.zip" -Destination $msixUploadOutput -Force
 Write-Host "Package upload-ready copy: $msixUploadOutput"
 
 Write-Host "Deployment prep completed."
